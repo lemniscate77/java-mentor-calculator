@@ -44,38 +44,36 @@ II
 
 public class Calculation {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println(" Начало работы программы \"Калькулятор\"  ");
         System.out.println(" Программа работает одновременно только с арабскими или только с римскими цифрами ");
         System.out.println(" Введите выражение для вычисления в одном из следующих форматов: a + b, a - b, a * b, a / b.");
+
         Scanner in = new Scanner (System.in);
         String calculation = in.nextLine();
+
         // решил убрать лишние пробелы в начале и в конце. соответственно, не будет сообщения о такой ошибке.
         calculation = calculation.trim();
-        // ЕСЛИ МЕЖДУ ЗНАКАМИ БОЛЬШЕ ПРОБЕЛОВ ЧЕМ НУЖНО, ТО ВЫДАТЬ СООБЩЕНИЕ ОБ ОШИБКЕ
+
         String[] blocks = calculation.split(" ");
 
-        /*  ДОБАВИТЬ ИСКЛЮЧЕНИЯ И ОШИБКИ, ПРОВЕРКУ УСЛОВИЙ ВВОДА
-            И ПРЕДУСМОТРЕТЬ ВЫВОД СОБЩЕНИЯ ЕСЛИ В РЕЗУЛТАТЕ ДЕЛЕНИЯ БУДЕТ ПОЛУЧАТЬСЯ НОЛЬ.
-            ПЕРЕПРИСВОИТЬ ПЕРЕМЕННЫЕ БЛОК ДЛЯ ЛУЧШЕГО ПОНИМАНИЯ КОДА
-        */
-        // СЮДА ВСТАВИТЬ ПРОВЕРКУ НА ОШИБОЧНЫЙ ВВОД
-
-         if (arabicNumbers.isInputValueIsNumber(blocks[0])&&arabicNumbers.isInputValueIsNumber(blocks[2])&&operations.isInputOperationIsCorrect(blocks[1])) {
-                System.out.print (blocks[0] + " " + blocks[1] + " " + blocks[2] +" = ");
-                System.out.println (arabicNumbers.calculateArabicNumber(blocks[0],blocks[2],blocks[1]));
+        try {
+            if (arabicNumbers.isInputValueIsNumber(blocks[0]) && arabicNumbers.isInputValueIsNumber(blocks[2]) && operations.isInputOperationIsCorrect(blocks[1])) {
+                //System.out.print(blocks[0] + " " + blocks[1] + " " + blocks[2] + " = ");
+                System.out.println(arabicNumbers.calculateArabicNumber(blocks[0], blocks[2], blocks[1]));
+            } else if (romanNumbers.isInputValueIsNumber(blocks[0]) && romanNumbers.isInputValueIsNumber(blocks[2]) && operations.isInputOperationIsCorrect(blocks[1])) {
+                //System.out.print(blocks[0] + " " + blocks[1] + " " + blocks[2] + " = ");
+                if (romanNumbers.calculateRomanNumbers(blocks[0], blocks[2], blocks[1]) != null)
+                    System.out.println(romanNumbers.calculateRomanNumbers(blocks[0], blocks[2], blocks[1]));
+            }
+            else throw new Exception();
         }
-        else if (romanNumbers.isInputValueIsNumber(blocks[0])&&romanNumbers.isInputValueIsNumber(blocks[2])&&operations.isInputOperationIsCorrect(blocks[1])) {
-                System.out.print (blocks[0] + " " + blocks[1] + " " + blocks[2] +" = ");
-                System.out.println(romanNumbers.calculateRomanNumbers(blocks[0],blocks[2],blocks[1]));
+        catch (Exception e) {
+                 System.out.println("Ошибка! Проверьте правильность введенных данных"); //  e.printStackTrace();
         }
-        else {
-                 System.out.println(" Внимание: проверьте правильность введенных данных на соответствие формату данных!");
+        finally {
                  System.out.println(" Конец работы.");
         }
-        // ЗДЕСЬ ПРОВЕРИМ РИМСКИЕ ЛИ ЧИСЛА ВВЕДЕНЫ
-        // ПРОВЕРКА ОПЕРАЦИЙ
-        // ВЫВЕДЕМ ОШИБКУ ЕСЛИ НЕ РИМСКИЕ И НЕ АРАБСКИЕ, А ТАКЖЕ  ЕСЛИ МНОГО ПРОБЕЛОВ ИЛИ ДРУГОЙ ЗНАК ОПЕРАЦИИ.
 
         in.close();
     }
@@ -109,7 +107,7 @@ public class Calculation {
         }
     }
 
-    static class romanNumbers extends arabicNumbers{
+    static class romanNumbers extends arabicNumbers {
         // предусмотреть ошибку если нацело не делится. или вывести отдельное сообщение.
             static String[] romanNums = new String [] {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
             static String[] romanNumsDec = new String [] {"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC", "C"};
@@ -124,28 +122,29 @@ public class Calculation {
             }
 
 
-        static String calculateRomanNumbers (String value1, String value2, String operator)
-            {
-                for (int j = 0; j < lenDec-1; j++) {
-                    for (int i = 0; i < lenNums; i++) {
-                        if (i == 9) romanNumsAll[j*10+i] = romanNumsDec[j+1];
-                            else romanNumsAll[j*10+i] = romanNumsDec[j] + romanNums[i];
-                    }
+        static String calculateRomanNumbers (String value1, String value2, String operator) {
+            for (int j = 0; j < lenDec - 1; j++) {
+                for (int i = 0; i < lenNums; i++) {
+                    if (i == 9) romanNumsAll[j * 10 + i] = romanNumsDec[j + 1];
+                    else romanNumsAll[j * 10 + i] = romanNumsDec[j] + romanNums[i];
                 }
-
-                String value1toArabic = Integer.toString(Arrays.binarySearch(romanNums, value1)+1);
-                String value2toArabic = Integer.toString(Arrays.binarySearch(romanNums, value2)+1);
-
-                int resultatArabic = arabicNumbers.calculateArabicNumber(value1toArabic, value2toArabic, operator);
-                //System.out.println(resultatArabic);
-
-                //String resultRoman = romanNumsAll[resultatArabic-1];
-                // А ЧТО ЕСЛИ РЕЗУЛЬТАТ ОТ ДЕЛЕНИЯ БУДЕТ РАВЕН НУЛЮ ???? ПРЕДУСМОТРЕТЬ
-                //System.out.println(resultRoman);
-
-            if (resultatArabic-1 >= 0) return romanNumsAll[resultatArabic-1];
-            else return "ноль";
             }
+
+            String value1toArabic = Integer.toString(Arrays.binarySearch(romanNums, value1) + 1);
+            String value2toArabic = Integer.toString(Arrays.binarySearch(romanNums, value2) + 1);
+
+            int resultatArabic = arabicNumbers.calculateArabicNumber(value1toArabic, value2toArabic, operator);
+
+            String resultat = null;
+
+            try {
+                resultat = romanNumsAll[resultatArabic - 1];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("\n Римское число не может быть меньше единицы.");
+            }
+            return resultat;
+        }
+
 
         public static int findIndex(String[] list, String value)
             {
@@ -165,8 +164,6 @@ public class Calculation {
              {
             return Arrays.asList(operations).contains(value);
              }
-
-
 
     }
 
